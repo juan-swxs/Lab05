@@ -1,5 +1,7 @@
 {
     "java.project.referencedLibraries": [
+        "Lib/flatlaf-3.5.1.jar",
+        "Lib/flatlaf-intellij-themes-3.5.1.jar",
         "Lib/jcommon-1.0.23.jar",
         "Lib/jfreechart-1.0.19.jar"
     ]
