@@ -2,11 +2,13 @@
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
@@ -23,11 +25,22 @@ public class AnalisisEstadistico extends JFrame {
     private CardLayout cardLayout;
     private BackgroundPanel subpanel;
     private BackgroundPanel panel3;
+    private JTextField fecha;
+    private JTextField edad;
+    private JComboBox<String> sexo;
+    private JComboBox<String> diagnostico;
+    private JComboBox<String> principal;
+    private JComboBox<String> tipo;
+    private JComboBox<String> clase;
+    private JComboBox<String> especialidad;
+    private BarGraph grafico;
+    private ArrayList<Paciente> pacientes;
 
     public AnalisisEstadistico() {
         setSize(570, 460);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        pacientes = new ArrayList<>();
         panels();
         changeText();
         changeButtons();
@@ -66,7 +79,7 @@ public class AnalisisEstadistico extends JFrame {
         subpanel.add(separator2);
         panel.add(subpanel);
         panel.add(panel3);
-        panelSetting.add(panel);
+        panelSetting.add(panel, "home");
         panelSetting.add(panelInto, "Ingreso datos");
         this.getContentPane().add(panelSetting);
     }
@@ -107,6 +120,19 @@ public class AnalisisEstadistico extends JFrame {
         JButton selectGraph = new JButton("📊");
         selectGraph.setFont(new Font("serif", Font.LAYOUT_RIGHT_TO_LEFT, 25));
         selectGraph.setBounds(244, 314, 50, 50);
+        selectGraph.addActionListener(e -> {
+            grafico = new BarGraph();
+
+            if(pacientes.isEmpty()) {
+                JOptionPane.showMessageDialog(null,
+                    "No se ha ingresado datos para la grafica.",
+                    "Advertencia", JOptionPane.WARNING_MESSAGE);
+                    return;
+            }
+
+            grafico.generateChart(pacientes);
+            grafico.setVisible(true);
+        });
 
         JButton discharge = new JButton("📥");
         discharge.setFont(new Font("serif", Font.ROMAN_BASELINE, 25));
@@ -121,35 +147,35 @@ public class AnalisisEstadistico extends JFrame {
     private void createForm() {
         labelsForm();
 
-        JTextField fecha = new JTextField();
+        fecha = new JTextField();
         fecha.setBounds(30, 81, 480, 25);
 
-        JTextField edad = new JTextField();
+        edad = new JTextField();
         edad.setBounds(30, 145, 190, 25);
 
-        JComboBox<String> sexo = new JComboBox<>(new String[] { "Masculino", "Femenino" });
+        sexo = new JComboBox<>(new String[] { "Masculino", "Femenino" });
         sexo.setSelectedIndex(-1);
         sexo.setBounds(300, 145, 190, 25);
 
-        JComboBox<String> diagnostico = new JComboBox<>(new String[] { "Acne Quistico", "Dermatitis Seborreica",
+        diagnostico = new JComboBox<>(new String[] { "Acne Quistico", "Dermatitis Seborreica",
                 "Rosacea", "Lentigo Solar", "Fotoenvejecimiento" });
         diagnostico.setSelectedIndex(-1);
-        diagnostico.setBounds(30, 254, 190, 25);
+        diagnostico.setBounds(30, 251, 190, 25);
 
-        JComboBox<String> principal = new JComboBox<>(new String[] { "Si", "No", "Formas y causas no especificada",
+        principal = new JComboBox<>(new String[] { "Si", "No", "Formas y causas no especificada",
                 "Debido a cosmeticos", "Debido a otros agentes", "Debido a droguas en contacto con la piel" });
         principal.setSelectedIndex(-1);
-        principal.setBounds(300, 254, 190, 25);
+        principal.setBounds(300, 251, 190, 25);
 
-        JComboBox<String> tipo = new JComboBox<>(new String[] { "Presuntivo", "Definitivo" });
+        tipo = new JComboBox<>(new String[] { "Presuntivo", "Definitivo" });
         tipo.setSelectedIndex(-1);
         tipo.setBounds(30, 325, 130, 25);
 
-        JComboBox<String> clase = new JComboBox<>(new String[] { "Confirmado nuevo", "Confirmado repetido", "Impresion diagnostica" });
+        clase = new JComboBox<>(new String[] { "Confirmado nuevo", "Confirmado repetido", "Impresion diagnostica" });
         clase.setSelectedIndex(-1);
         clase.setBounds(190, 325, 130, 25);
 
-        JComboBox<String> especialidad = new JComboBox<>(new String[] { "Dermatologia", "Cirugia Plastica",
+        especialidad = new JComboBox<>(new String[] { "Dermatologia", "Cirugia Plastica",
                 "Dermatopediatria", "Cirugia dermatologica", "Hansen", "Ulceras", "Cirugia vascular periferica",
                 "Fisioterapia", "Actividad fototerapia", "Consulta prequirurgica", "Leishmaniasis" });
         especialidad.setSelectedIndex(-1);
@@ -159,13 +185,15 @@ public class AnalisisEstadistico extends JFrame {
         backButton.setBackground(new Color(20, 20, 20));
         backButton.setBounds(40, 374, 100, 30);
         backButton.addActionListener(e -> {
-            cardLayout.previous(panelSetting);
+            cardLayout.show(panelSetting, "home");
         });
 
         JButton login = new JButton("Login");
         login.setBackground(new Color(20, 20, 20));
         login.setBounds(390, 374, 100, 30);
-        
+        login.addActionListener(e -> {
+            informationEntered();
+        });
 
         panelInto.add(fecha);
         panelInto.add(edad);
@@ -249,6 +277,71 @@ public class AnalisisEstadistico extends JFrame {
         panelInto.add(textClase);
         panelInto.add(textEspecialidad);
 
+    }
+
+    private void informationEntered() {
+        String fechaVal = fecha.getText();
+        String edadVal = edad.getText();
+        String sexoVal = (String) sexo.getSelectedItem();
+        String diagnosticoVal = (String) diagnostico.getSelectedItem();
+        String principalVal = (String) principal.getSelectedItem();
+        String tipoVal = (String) tipo.getSelectedItem();
+        String claseVal = (String) clase.getSelectedItem();
+        String especialidadVal = (String) especialidad.getSelectedItem();
+        String[] validar = fechaVal.split("/");
+        int edadIngresada;
+        String diagnosticoSeleccionado = (String) diagnostico.getSelectedItem();
+        int año, mes, dia;
+
+        if (fechaVal.isEmpty() || edadVal.isEmpty() || sexoVal == null || diagnosticoVal == null
+                || principalVal == null || tipoVal == null || claseVal == null || especialidadVal == null) {
+            JOptionPane.showMessageDialog(this, "Por favor, completa todos los campos.", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        if(validar.length != 3) {
+            JOptionPane.showMessageDialog(this, "Formato de fecha invalido!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            edadIngresada = Integer.parseInt(edad.getText());
+
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Por favor, ingrese un número válido para la edad", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            año = Integer.parseInt(validar[0]);
+            mes = Integer.parseInt(validar[1]);
+            dia = Integer.parseInt(validar[2]);
+            
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Ingresar numeros enteros para la fecha", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Paciente pacient = new Paciente(diagnosticoSeleccionado, edadIngresada);
+        pacientes.add(pacient);
+
+        if(!pacientes.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Datos ingresados con éxito", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        }
+
+        reset();
+    }
+
+    private void reset() {
+        fecha.setText("");
+        edad.setText("");
+        sexo.setSelectedIndex(-1);
+        diagnostico.setSelectedIndex(-1);
+        principal.setSelectedIndex(-1);
+        tipo.setSelectedIndex(-1);
+        clase.setSelectedIndex(-1);
+        especialidad.setSelectedIndex(-1);
     }
 
 }
