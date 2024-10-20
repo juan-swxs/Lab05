@@ -1,15 +1,18 @@
 
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.util.ArrayList;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -34,6 +37,8 @@ public class AnalisisEstadistico extends JFrame {
     private JComboBox<String> clase;
     private JComboBox<String> especialidad;
     private BarGraph grafico;
+    private LineGraph graficoLine;
+    private PieChart graficoCircular;
     private ArrayList<Paciente> pacientes;
 
     public AnalisisEstadistico() {
@@ -122,16 +127,14 @@ public class AnalisisEstadistico extends JFrame {
         selectGraph.setBounds(244, 314, 50, 50);
         selectGraph.addActionListener(e -> {
             grafico = new BarGraph();
-
+            graficoLine = new LineGraph();
+            graficoCircular = new PieChart();
             if (pacientes.isEmpty()) {
-                JOptionPane.showMessageDialog(null,
-                        "No se ha ingresado datos para la grafica.",
+                JOptionPane.showMessageDialog(null, "No se ha ingresado datos para la grafica.",
                         "Advertencia", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-
-            grafico.generateChart(pacientes);
-            grafico.setVisible(true);
+            charTypeSelection();
         });
 
         JButton discharge = new JButton("📥");
@@ -153,6 +156,46 @@ public class AnalisisEstadistico extends JFrame {
         tipo.setSelectedIndex(-1);
         clase.setSelectedIndex(-1);
         especialidad.setSelectedIndex(-1);
+    }
+
+    private void charTypeSelection() {
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        panel.setPreferredSize(new Dimension(300, 80));
+
+        JRadioButton barras = new JRadioButton("📊");
+        barras.setFont(new Font("serif", Font.ROMAN_BASELINE, 34));
+        barras.setBounds(6, 25, 100, 30);
+        panel.add(barras);
+
+        JRadioButton Lineas = new JRadioButton("📈");
+        Lineas.setFont(new Font("serif", Font.ROMAN_BASELINE, 34));
+        Lineas.setBounds(110, 25, 100, 30);
+        panel.add(Lineas);
+
+        JRadioButton circular = new JRadioButton("◕");
+        circular.setFont(new Font("serif", Font.ROMAN_BASELINE, 45));
+        circular.setBounds(210, 20, 100, 38);
+        panel.add(circular);
+
+        ButtonGroup group = new ButtonGroup();
+        group.add(barras);
+        group.add(Lineas);
+        group.add(circular);
+
+        JOptionPane.showMessageDialog(null, panel, "Tipos de grafica", JOptionPane.PLAIN_MESSAGE);
+        
+        if (barras.isSelected()) {
+            grafico.generateChart(pacientes);
+            grafico.setVisible(true);
+        } else if (Lineas.isSelected()) {
+            graficoLine.generateChart(pacientes);
+            graficoLine.setVisible(true);
+        } else if (circular.isSelected()) {
+            graficoCircular.generateChart(pacientes);
+            graficoCircular.setVisible(true);
+        }
+
     }
 
     private void createForm() {
