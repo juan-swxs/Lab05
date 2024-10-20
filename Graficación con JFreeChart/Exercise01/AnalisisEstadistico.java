@@ -48,8 +48,7 @@ public class AnalisisEstadistico extends JFrame {
 
     private void panels() {
         cardLayout = new CardLayout();
-        panelSetting = new JPanel();
-        panelSetting.setLayout(cardLayout);
+        panelSetting = new JPanel(cardLayout);
 
         panel = new JPanel();
         panel.setBackground(new Color(60, 45, 45));
@@ -66,6 +65,7 @@ public class AnalisisEstadistico extends JFrame {
 
         panelInto = new JPanel();
         panelInto.setLayout(null);
+        createForm();
 
         JSeparator separator = new JSeparator(SwingConstants.CENTER);
         separator.setForeground(new Color(158, 136, 124));
@@ -114,7 +114,7 @@ public class AnalisisEstadistico extends JFrame {
         button.setBounds(85, 314, 50, 50);
         button.addActionListener(e -> {
             cardLayout.show(panelSetting, "Ingreso datos");
-            createForm();
+            resetForm();
         });
 
         JButton selectGraph = new JButton("📊");
@@ -123,11 +123,11 @@ public class AnalisisEstadistico extends JFrame {
         selectGraph.addActionListener(e -> {
             grafico = new BarGraph();
 
-            if(pacientes.isEmpty()) {
+            if (pacientes.isEmpty()) {
                 JOptionPane.showMessageDialog(null,
-                    "No se ha ingresado datos para la grafica.",
-                    "Advertencia", JOptionPane.WARNING_MESSAGE);
-                    return;
+                        "No se ha ingresado datos para la grafica.",
+                        "Advertencia", JOptionPane.WARNING_MESSAGE);
+                return;
             }
 
             grafico.generateChart(pacientes);
@@ -142,6 +142,17 @@ public class AnalisisEstadistico extends JFrame {
         panel.add(button);
         panel.add(selectGraph);
         panel.add(discharge);
+    }
+
+    private void resetForm() {
+        fecha.setText("");
+        edad.setText("");
+        sexo.setSelectedIndex(-1);
+        diagnostico.setSelectedIndex(-1);
+        principal.setSelectedIndex(-1);
+        tipo.setSelectedIndex(-1);
+        clase.setSelectedIndex(-1);
+        especialidad.setSelectedIndex(-1);
     }
 
     private void createForm() {
@@ -209,7 +220,7 @@ public class AnalisisEstadistico extends JFrame {
 
     private void labelsForm() {
         JLabel title2 = new JLabel("Datos personales");
-        title2.setForeground(null);
+        title2.setForeground(Color.WHITE);
         title2.setFont(new Font("Times new roman", Font.ITALIC, 16));
         title2.setBounds(30, 10, 120, 30);
 
@@ -217,22 +228,22 @@ public class AnalisisEstadistico extends JFrame {
         separator.setBounds(30, 42, 490, 190);
 
         JLabel textFecha = new JLabel("Fecha");
-        textFecha.setForeground(null);
+        textFecha.setForeground(Color.WHITE);
         textFecha.setFont(new Font("serif", Font.ROMAN_BASELINE, 13));
         textFecha.setBounds(30, 50, 80, 30);
 
         JLabel textEdad = new JLabel("Edad");
-        textEdad.setForeground(null);
+        textEdad.setForeground(Color.WHITE);
         textEdad.setFont(new Font("serif", Font.ROMAN_BASELINE, 13));
         textEdad.setBounds(30, 114, 70, 30);
 
         JLabel textSexo = new JLabel("Sexo");
-        textSexo.setForeground(null);
+        textSexo.setForeground(Color.WHITE);
         textSexo.setFont(new Font("serif", Font.ROMAN_BASELINE, 13));
         textSexo.setBounds(300, 114, 70, 30);
 
         JLabel title3 = new JLabel("Datos medicos");
-        title3.setForeground(null);
+        title3.setForeground(Color.WHITE);
         title3.setFont(new Font("Times new roman", Font.ITALIC, 16));
         title3.setBounds(30, 182, 120, 30);
 
@@ -240,27 +251,27 @@ public class AnalisisEstadistico extends JFrame {
         separator2.setBounds(30, 213, 490, 190);
 
         JLabel textDiagnostico = new JLabel("Diagnostico");
-        textDiagnostico.setForeground(null);
+        textDiagnostico.setForeground(Color.WHITE);
         textDiagnostico.setFont(new Font("serif", Font.ROMAN_BASELINE, 13));
         textDiagnostico.setBounds(30, 219, 80, 30);
 
         JLabel textPrincipal = new JLabel("Principal");
-        textPrincipal.setForeground(null);
+        textPrincipal.setForeground(Color.WHITE);
         textPrincipal.setFont(new Font("serif", Font.ROMAN_BASELINE, 13));
         textPrincipal.setBounds(300, 219, 80, 30);
 
         JLabel textTipo = new JLabel("Tipo");
-        textTipo.setForeground(null);
+        textTipo.setForeground(Color.WHITE);
         textTipo.setFont(new Font("serif", Font.ROMAN_BASELINE, 13));
         textTipo.setBounds(30, 293, 80, 30);
 
         JLabel textClase = new JLabel("Clase");
-        textClase.setForeground(null);
+        textClase.setForeground(Color.WHITE);
         textClase.setFont(new Font("serif", Font.ROMAN_BASELINE, 13));
         textClase.setBounds(190, 293, 70, 30);
 
         JLabel textEspecialidad = new JLabel("Especialidad");
-        textEspecialidad.setForeground(null);
+        textEspecialidad.setForeground(Color.WHITE);
         textEspecialidad.setFont(new Font("serif", Font.ROMAN_BASELINE, 13));
         textEspecialidad.setBounds(350, 293, 80, 30);
 
@@ -280,27 +291,19 @@ public class AnalisisEstadistico extends JFrame {
     }
 
     private void informationEntered() {
-        String fechaVal = fecha.getText();
-        String edadVal = edad.getText();
-        String sexoVal = (String) sexo.getSelectedItem();
-        String diagnosticoVal = (String) diagnostico.getSelectedItem();
-        String principalVal = (String) principal.getSelectedItem();
-        String tipoVal = (String) tipo.getSelectedItem();
-        String claseVal = (String) clase.getSelectedItem();
-        String especialidadVal = (String) especialidad.getSelectedItem();
-        String[] validar = fechaVal.split("/");
-        int edadIngresada;
         String diagnosticoSeleccionado = (String) diagnostico.getSelectedItem();
+        String fechaVal = fecha.getText();
+        int edadIngresada;
+        String[] validar = fechaVal.split("/");
         int año, mes, dia;
 
-        if (fechaVal.isEmpty() || edadVal.isEmpty() || sexoVal == null || diagnosticoVal == null
-                || principalVal == null || tipoVal == null || claseVal == null || especialidadVal == null) {
+        if (fechaVal.isEmpty() || sexo.getSelectedIndex() == -1 || diagnostico.getSelectedIndex() == -1
+                || principal.getSelectedIndex() == -1 || tipo.getSelectedIndex() == -1 || clase.getSelectedIndex() == -1
+                || especialidad.getSelectedIndex() == -1) {
             JOptionPane.showMessageDialog(this, "Por favor, completa todos los campos.", "Error",
                     JOptionPane.ERROR_MESSAGE);
             return;
-        }
-        
-        if(validar.length != 3) {
+        } else if (validar.length != 3) {
             JOptionPane.showMessageDialog(this, "Formato de fecha invalido!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -309,7 +312,8 @@ public class AnalisisEstadistico extends JFrame {
             edadIngresada = Integer.parseInt(edad.getText());
 
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Por favor, ingrese un número válido para la edad", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Por favor, ingrese un número válido para la edad", "Error",
+                    JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -317,31 +321,21 @@ public class AnalisisEstadistico extends JFrame {
             año = Integer.parseInt(validar[0]);
             mes = Integer.parseInt(validar[1]);
             dia = Integer.parseInt(validar[2]);
-            
+
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Ingresar numeros enteros para la fecha", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Ingresar numeros enteros para la fecha", "Error",
+                    JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         Paciente pacient = new Paciente(diagnosticoSeleccionado, edadIngresada);
         pacientes.add(pacient);
 
-        if(!pacientes.isEmpty()) {
+        if (!pacientes.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Datos ingresados con éxito", "Éxito", JOptionPane.INFORMATION_MESSAGE);
         }
 
-        reset();
-    }
-
-    private void reset() {
-        fecha.setText("");
-        edad.setText("");
-        sexo.setSelectedIndex(-1);
-        diagnostico.setSelectedIndex(-1);
-        principal.setSelectedIndex(-1);
-        tipo.setSelectedIndex(-1);
-        clase.setSelectedIndex(-1);
-        especialidad.setSelectedIndex(-1);
+        resetForm();
     }
 
 }
