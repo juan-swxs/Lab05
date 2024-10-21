@@ -7,8 +7,10 @@ import javax.swing.JFrame;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 public class LineGraph extends JFrame {
 
@@ -18,42 +20,33 @@ public class LineGraph extends JFrame {
     }
 
     public void generateChart(ArrayList<Paciente> pacientes) {
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        Map<String, Map<Integer, Integer>> datosPorEnfermedad = new HashMap<>();
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        XYSeries series = new XYSeries("% edades con diagnosticos ");
 
+        Map<Integer, Integer> edadContador = new HashMap<>();
         for (Paciente p : pacientes) {
-            String diagnostico = p.getDiagnostico();
             int edad = p.getEdad();
-
-            datosPorEnfermedad.putIfAbsent(diagnostico, new HashMap<>());
-
-            Map<Integer, Integer> edadContador = datosPorEnfermedad.get(diagnostico);
             edadContador.put(edad, edadContador.getOrDefault(edad, 0) + 1);
         }
 
-        for (Map.Entry<String, Map<Integer, Integer>> entry : datosPorEnfermedad.entrySet()) {
-            String enfermedad = entry.getKey();
-            Map<Integer, Integer> edadContador = entry.getValue();
-
-            for (Map.Entry<Integer, Integer> edadEntry : edadContador.entrySet()) {
-                int edad = edadEntry.getKey();
-                int cantidad = edadEntry.getValue();
-                dataset.addValue(cantidad, enfermedad, String.valueOf(edad));
-            }
+        for (Map.Entry<Integer, Integer> entry : edadContador.entrySet()) {
+            series.add(entry.getKey(), entry.getValue()); 
         }
 
-        JFreeChart lineChart = ChartFactory.createLineChart(
-                "Edad por Diagnóstico",
-                "Diagnóstico",
-                "Cantidad de pacientes",
-                dataset,
-                PlotOrientation.VERTICAL,
-                true,
-                true,
-                false);
+        dataset.addSeries(series);
 
-        ChartPanel chart = new ChartPanel(lineChart);
-        add(chart);
+        JFreeChart lineChart = ChartFactory.createXYLineChart(
+                "Cantidad de Pacientes por Edad",
+                "Edad",
+                "Cantidad",
+                dataset
+        );
+
+        XYPlot plot = lineChart.getXYPlot();
+        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(true, true);
+        plot.setRenderer(renderer);
+        
+        ChartPanel chartPanel = new ChartPanel(lineChart);
+        add(chartPanel);
     }
-
 }

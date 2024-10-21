@@ -3,11 +3,16 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -40,12 +45,14 @@ public class AnalisisEstadistico extends JFrame {
     private LineGraph graficoLine;
     private PieChart graficoCircular;
     private ArrayList<Paciente> pacientes;
+    private ArrayList<ArrayList<String>> save;
 
     public AnalisisEstadistico() {
         setSize(570, 460);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         pacientes = new ArrayList<>();
+        save = new ArrayList<>();
         panels();
         changeText();
         changeButtons();
@@ -140,6 +147,14 @@ public class AnalisisEstadistico extends JFrame {
         JButton discharge = new JButton("📥");
         discharge.setFont(new Font("serif", Font.ROMAN_BASELINE, 25));
         discharge.setBounds(400, 314, 50, 50);
+        discharge.addActionListener(e -> {
+            if(pacientes.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "No hay datos para descargar el archivo csv",
+                        "Advertencia", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            generateCsv();
+        });
 
         SwingUtilities.invokeLater(() -> panel3.requestFocusInWindow());
         panel.add(button);
@@ -170,7 +185,7 @@ public class AnalisisEstadistico extends JFrame {
 
         JRadioButton Lineas = new JRadioButton("📈");
         Lineas.setFont(new Font("serif", Font.ROMAN_BASELINE, 34));
-        Lineas.setBounds(110, 25, 100, 30);
+        Lineas.setBounds(109, 25, 100, 30);
         panel.add(Lineas);
 
         JRadioButton circular = new JRadioButton("◕");
@@ -184,7 +199,7 @@ public class AnalisisEstadistico extends JFrame {
         group.add(circular);
 
         JOptionPane.showMessageDialog(null, panel, "Tipos de grafica", JOptionPane.PLAIN_MESSAGE);
-        
+
         if (barras.isSelected()) {
             grafico.generateChart(pacientes);
             grafico.setVisible(true);
@@ -336,6 +351,12 @@ public class AnalisisEstadistico extends JFrame {
     private void informationEntered() {
         String diagnosticoSeleccionado = (String) diagnostico.getSelectedItem();
         String fechaVal = fecha.getText();
+        String edadVal = edad.getText();
+        String sexoVal = (String) sexo.getSelectedItem();
+        String principalVal = (String) principal.getSelectedItem();
+        String tipoVal = (String) tipo.getSelectedItem();
+        String claseVal = (String) clase.getSelectedItem();
+        String especialidadVal = (String) especialidad.getSelectedItem();
         int edadIngresada;
         String[] validar = fechaVal.split("/");
         int año, mes, dia;
@@ -371,14 +392,57 @@ public class AnalisisEstadistico extends JFrame {
             return;
         }
 
+        String fechaComplet = String.format("%02d/%02d/%02d", año, mes, dia);
+
         Paciente pacient = new Paciente(diagnosticoSeleccionado, edadIngresada);
         pacientes.add(pacient);
+
+        ArrayList<String> fila = new ArrayList<>();
+
+        fila.add(fechaComplet);
+        fila.add(edadVal);
+        fila.add(sexoVal);
+        fila.add(diagnosticoSeleccionado);
+        fila.add(principalVal);
+        fila.add(tipoVal);
+        fila.add(claseVal);
+        fila.add(especialidadVal);
+        save.add(fila);
 
         if (!pacientes.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Datos ingresados con éxito", "Éxito", JOptionPane.INFORMATION_MESSAGE);
         }
 
         resetForm();
+    }
+
+    private void generateCsv() {
+        String[] columna = { "Fecha", "Edad", "Sexo", "Diagnostico", "Principal", "Tipo", "Clase", "Especialidad" };
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Diagnostico por edad");
+        fileChooser.setSelectedFile(new File("datos.csv"));
+
+        int userSelection = fileChooser.showSaveDialog(null);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                writer.write(String.join("-", columna));
+                writer.newLine();
+
+                for (ArrayList<String> fila : save) {
+                    writer.write(String.join("-", fila));
+                    writer.newLine(); 
+                }
+
+                JOptionPane.showMessageDialog(this, "Archivo CSV guardado exitosamente."); 
+
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null, "Error al guardar el archivo: " + ex.getMessage());
+            }
+
+        }
+
     }
 
 }
