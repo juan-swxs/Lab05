@@ -48,8 +48,9 @@ public class AnalisisEstadistico extends JFrame {
     private ArrayList<ArrayList<String>> save;
 
     public AnalisisEstadistico() {
-        setSize(570, 460);
+        setSize(570, 450);
         setLocationRelativeTo(null);
+        setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         pacientes = new ArrayList<>();
         save = new ArrayList<>();
@@ -113,11 +114,47 @@ public class AnalisisEstadistico extends JFrame {
         JLabel textDischarge = new JLabel("Descargar csv");
         textDischarge.setBounds(392, 355, 100, 30);
 
+        JLabel icon = new JLabel("🍁");
+        icon.setForeground(new Color(74, 56, 54));
+        icon.setFont(new Font("serif", Font.LAYOUT_RIGHT_TO_LEFT, 40));
+        icon.setBounds(19, 32, 100, 40);
+
+        JLabel textIcon = new JLabel("Dermatology");
+        textIcon.setForeground(new Color(111, 91, 82));
+        textIcon.setFont(new Font("Times new roman", Font.ROMAN_BASELINE, 14));
+        textIcon.setBounds(66, 28,100, 30);
+
+        JLabel textIcon2 = new JLabel("Beuty");
+        textIcon2.setForeground(new Color(111, 91, 82));
+        textIcon2.setFont(new Font("Times new roman", Font.ROMAN_BASELINE, 14));
+        textIcon2.setBounds(66, 44,100, 30);
+
+        JLabel titlePanel3 = new JLabel("DIAGNOSTICS");
+        titlePanel3.setForeground(new Color(74, 56, 54));
+        titlePanel3.setFont(new Font("Times new roman", Font.ROMAN_BASELINE, 29));
+        titlePanel3.setBounds(40, 89, 210, 50);
+
+        JLabel titlePanel4 = new JLabel("  graphic analysis");
+        titlePanel4.setForeground(new Color(74, 56, 54));
+        titlePanel4.setFont(new Font("Agatha", Font.ITALIC, 32));
+        titlePanel4.setBounds(34, 121, 300, 50);
+
+        JLabel titlePanel5 = new JLabel("🍂");
+        titlePanel5.setForeground(new Color(74, 56, 54));
+        titlePanel5.setFont(new Font("serif", Font.ITALIC, 20));
+        titlePanel5.setBounds(170, 139, 50, 30);
+
         panel.add(title);
         panel.add(title2);
         panel.add(textButton);
         panel.add(textSelectGraph);
         panel.add(textDischarge);
+        panel3.add(icon);
+        panel3.add(textIcon);
+        panel3.add(textIcon2);
+        panel3.add(titlePanel3);
+        panel3.add(titlePanel4);
+        panel3.add(titlePanel5);
     }
 
     private void changeButtons() {
@@ -176,21 +213,23 @@ public class AnalisisEstadistico extends JFrame {
     private void charTypeSelection() {
         JPanel panel = new JPanel();
         panel.setLayout(null);
-        panel.setPreferredSize(new Dimension(300, 80));
+        panel.setPreferredSize(new Dimension(300, 73));
+
+        labelsSelectionGraphs(panel);
 
         JRadioButton barras = new JRadioButton("📊");
         barras.setFont(new Font("serif", Font.ROMAN_BASELINE, 34));
-        barras.setBounds(6, 25, 100, 30);
+        barras.setBounds(6, 32, 100, 30);
         panel.add(barras);
 
         JRadioButton Lineas = new JRadioButton("📈");
         Lineas.setFont(new Font("serif", Font.ROMAN_BASELINE, 34));
-        Lineas.setBounds(109, 25, 100, 30);
+        Lineas.setBounds(108, 32, 100, 30);
         panel.add(Lineas);
 
         JRadioButton circular = new JRadioButton("◕");
         circular.setFont(new Font("serif", Font.ROMAN_BASELINE, 45));
-        circular.setBounds(210, 20, 100, 38);
+        circular.setBounds(210, 27, 100, 36);
         panel.add(circular);
 
         ButtonGroup group = new ButtonGroup();
@@ -198,68 +237,88 @@ public class AnalisisEstadistico extends JFrame {
         group.add(Lineas);
         group.add(circular);
 
-        JOptionPane.showMessageDialog(null, panel, "Tipos de grafica", JOptionPane.PLAIN_MESSAGE);
+        int opcion = JOptionPane.showConfirmDialog(null, panel, "Tipos de gráfica", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
-        if (barras.isSelected()) {
-            grafico.generateChart(pacientes);
-            grafico.setVisible(true);
-        } else if (Lineas.isSelected()) {
-            graficoLine.generateChart(pacientes);
-            graficoLine.setVisible(true);
-        } else if (circular.isSelected()) {
-            graficoCircular.generateChart(pacientes);
-            graficoCircular.setVisible(true);
-        }
+        if (opcion == JOptionPane.OK_OPTION) {
+            if (barras.isSelected()) {
+                grafico.generateChart(pacientes);
+                grafico.setVisible(true);
+            } else if (Lineas.isSelected()) {
+                graficoLine.generateChart(pacientes);
+                graficoLine.setVisible(true);
+            } else if (circular.isSelected()) {
+                graficoCircular.generateChart(pacientes);
+                graficoCircular.setVisible(true);
+            }
+        }  
 
+    }
+
+    private void labelsSelectionGraphs(JPanel panel) {
+        JLabel textBarras = new JLabel("Bar graph");
+        textBarras.setForeground(null);
+        textBarras.setBounds(18, 0, 80, 30);
+
+        JLabel textLineas = new JLabel("Scatter plot");
+        textLineas.setForeground(null);
+        textLineas.setBounds(116, 0, 80, 30);
+
+        JLabel textCircular = new JLabel("Circular graph");
+        textCircular.setForeground(null);
+        textCircular.setBounds(214, 0, 80, 30);
+
+        panel.add(textBarras);
+        panel.add(textLineas);
+        panel.add(textCircular);
     }
 
     private void createForm() {
         labelsForm();
 
         fecha = new JTextField();
-        fecha.setBounds(30, 81, 480, 25);
+        fecha.setBounds(30, 77, 480, 25);
 
         edad = new JTextField();
-        edad.setBounds(30, 145, 190, 25);
+        edad.setBounds(30, 138, 190, 25);
 
         sexo = new JComboBox<>(new String[] { "Masculino", "Femenino" });
         sexo.setSelectedIndex(-1);
-        sexo.setBounds(300, 145, 190, 25);
+        sexo.setBounds(300, 139, 190, 25);
 
         diagnostico = new JComboBox<>(new String[] { "Acne Quistico", "Dermatitis Seborreica",
                 "Rosacea", "Lentigo Solar", "Fotoenvejecimiento" });
         diagnostico.setSelectedIndex(-1);
-        diagnostico.setBounds(30, 251, 190, 25);
+        diagnostico.setBounds(30, 246, 190, 25);
 
         principal = new JComboBox<>(new String[] { "Si", "No", "Formas y causas no especificada",
                 "Debido a cosmeticos", "Debido a otros agentes", "Debido a droguas en contacto con la piel" });
         principal.setSelectedIndex(-1);
-        principal.setBounds(300, 251, 190, 25);
+        principal.setBounds(300, 246, 190, 25);
 
         tipo = new JComboBox<>(new String[] { "Presuntivo", "Definitivo" });
         tipo.setSelectedIndex(-1);
-        tipo.setBounds(30, 325, 130, 25);
+        tipo.setBounds(30, 317, 130, 25);
 
         clase = new JComboBox<>(new String[] { "Confirmado nuevo", "Confirmado repetido", "Impresion diagnostica" });
         clase.setSelectedIndex(-1);
-        clase.setBounds(190, 325, 130, 25);
+        clase.setBounds(190, 317, 130, 25);
 
         especialidad = new JComboBox<>(new String[] { "Dermatologia", "Cirugia Plastica",
                 "Dermatopediatria", "Cirugia dermatologica", "Hansen", "Ulceras", "Cirugia vascular periferica",
                 "Fisioterapia", "Actividad fototerapia", "Consulta prequirurgica", "Leishmaniasis" });
         especialidad.setSelectedIndex(-1);
-        especialidad.setBounds(350, 325, 170, 25);
+        especialidad.setBounds(350, 317, 170, 25);
 
         JButton backButton = new JButton("Regresar");
         backButton.setBackground(new Color(20, 20, 20));
-        backButton.setBounds(40, 374, 100, 30);
+        backButton.setBounds(40, 363, 100, 30);
         backButton.addActionListener(e -> {
             cardLayout.show(panelSetting, "home");
         });
 
         JButton login = new JButton("Login");
         login.setBackground(new Color(20, 20, 20));
-        login.setBounds(390, 374, 100, 30);
+        login.setBounds(390, 363, 100, 30);
         login.addActionListener(e -> {
             informationEntered();
         });
@@ -280,58 +339,58 @@ public class AnalisisEstadistico extends JFrame {
         JLabel title2 = new JLabel("Datos personales");
         title2.setForeground(Color.WHITE);
         title2.setFont(new Font("Times new roman", Font.ITALIC, 16));
-        title2.setBounds(30, 10, 120, 30);
+        title2.setBounds(30, 8, 120, 30);
 
         JSeparator separator = new JSeparator(SwingConstants.CENTER);
-        separator.setBounds(30, 42, 490, 190);
+        separator.setBounds(30, 40, 490, 190);
 
         JLabel textFecha = new JLabel("Fecha");
         textFecha.setForeground(Color.WHITE);
         textFecha.setFont(new Font("serif", Font.ROMAN_BASELINE, 13));
-        textFecha.setBounds(30, 50, 80, 30);
+        textFecha.setBounds(30, 44, 80, 30);
 
         JLabel textEdad = new JLabel("Edad");
         textEdad.setForeground(Color.WHITE);
         textEdad.setFont(new Font("serif", Font.ROMAN_BASELINE, 13));
-        textEdad.setBounds(30, 114, 70, 30);
+        textEdad.setBounds(30, 107, 70, 30);
 
         JLabel textSexo = new JLabel("Sexo");
         textSexo.setForeground(Color.WHITE);
         textSexo.setFont(new Font("serif", Font.ROMAN_BASELINE, 13));
-        textSexo.setBounds(300, 114, 70, 30);
+        textSexo.setBounds(300, 107, 70, 30);
 
         JLabel title3 = new JLabel("Datos medicos");
         title3.setForeground(Color.WHITE);
         title3.setFont(new Font("Times new roman", Font.ITALIC, 16));
-        title3.setBounds(30, 182, 120, 30);
+        title3.setBounds(30, 175, 120, 30);
 
         JSeparator separator2 = new JSeparator(SwingConstants.CENTER);
-        separator2.setBounds(30, 213, 490, 190);
+        separator2.setBounds(30, 206, 490, 190);
 
         JLabel textDiagnostico = new JLabel("Diagnostico");
         textDiagnostico.setForeground(Color.WHITE);
         textDiagnostico.setFont(new Font("serif", Font.ROMAN_BASELINE, 13));
-        textDiagnostico.setBounds(30, 219, 80, 30);
+        textDiagnostico.setBounds(30, 212, 80, 30);
 
         JLabel textPrincipal = new JLabel("Principal");
         textPrincipal.setForeground(Color.WHITE);
         textPrincipal.setFont(new Font("serif", Font.ROMAN_BASELINE, 13));
-        textPrincipal.setBounds(300, 219, 80, 30);
+        textPrincipal.setBounds(300, 212, 80, 30);
 
         JLabel textTipo = new JLabel("Tipo");
         textTipo.setForeground(Color.WHITE);
         textTipo.setFont(new Font("serif", Font.ROMAN_BASELINE, 13));
-        textTipo.setBounds(30, 293, 80, 30);
+        textTipo.setBounds(30, 283, 80, 30);
 
         JLabel textClase = new JLabel("Clase");
         textClase.setForeground(Color.WHITE);
         textClase.setFont(new Font("serif", Font.ROMAN_BASELINE, 13));
-        textClase.setBounds(190, 293, 70, 30);
+        textClase.setBounds(190, 283, 70, 30);
 
         JLabel textEspecialidad = new JLabel("Especialidad");
         textEspecialidad.setForeground(Color.WHITE);
         textEspecialidad.setFont(new Font("serif", Font.ROMAN_BASELINE, 13));
-        textEspecialidad.setBounds(350, 293, 80, 30);
+        textEspecialidad.setBounds(350, 283, 80, 30);
 
         panelInto.add(title2);
         panelInto.add(separator);

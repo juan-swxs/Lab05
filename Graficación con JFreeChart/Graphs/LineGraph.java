@@ -36,7 +36,7 @@ public class LineGraph extends JFrame {
         dataset.addSeries(series);
 
         JFreeChart lineChart = ChartFactory.createXYLineChart(
-                "Cantidad de Pacientes por Edad",
+                "Diagnostico por edad",
                 "Edad",
                 "Cantidad",
                 dataset

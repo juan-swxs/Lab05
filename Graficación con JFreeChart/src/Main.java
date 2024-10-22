@@ -16,9 +16,9 @@ public class Main {
         UIManager.put("Button.arc", 999);
         UIManager.put("Button.borderWidth", 0);
         UIManager.put("Label.foreground", new Color(238, 218, 207));
-        AnalisisEstadistico hola = new AnalisisEstadistico();
+        AnalisisEstadistico graficas = new AnalisisEstadistico();
 
-        SwingUtilities.updateComponentTreeUI(hola);
-        hola.setVisible(true);
+        SwingUtilities.updateComponentTreeUI(graficas);
+        graficas.setVisible(true);
     }
 }
