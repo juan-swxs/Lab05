@@ -16,6 +16,7 @@ public class Main {
         UIManager.put("Button.arc", 999);
         UIManager.put("Button.borderWidth", 0);
         UIManager.put("Label.foreground", new Color(238, 218, 207));
+        UIManager.put("TextField.foreground", new Color(236,236,236,120));
         AnalisisEstadistico graficas = new AnalisisEstadistico();
 
         SwingUtilities.updateComponentTreeUI(graficas);

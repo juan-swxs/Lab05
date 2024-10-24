@@ -3,6 +3,8 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -122,12 +124,12 @@ public class AnalisisEstadistico extends JFrame {
         JLabel textIcon = new JLabel("Dermatology");
         textIcon.setForeground(new Color(111, 91, 82));
         textIcon.setFont(new Font("Times new roman", Font.ROMAN_BASELINE, 14));
-        textIcon.setBounds(66, 28,100, 30);
+        textIcon.setBounds(66, 28, 100, 30);
 
         JLabel textIcon2 = new JLabel("Beuty");
         textIcon2.setForeground(new Color(111, 91, 82));
         textIcon2.setFont(new Font("Times new roman", Font.ROMAN_BASELINE, 14));
-        textIcon2.setBounds(66, 44,100, 30);
+        textIcon2.setBounds(66, 44, 100, 30);
 
         JLabel titlePanel3 = new JLabel("DIAGNOSTICS");
         titlePanel3.setForeground(new Color(74, 56, 54));
@@ -163,7 +165,6 @@ public class AnalisisEstadistico extends JFrame {
         button.setBounds(85, 314, 50, 50);
         button.addActionListener(e -> {
             cardLayout.show(panelSetting, "Ingreso datos");
-            resetForm();
         });
 
         JButton selectGraph = new JButton("📊");
@@ -185,7 +186,7 @@ public class AnalisisEstadistico extends JFrame {
         discharge.setFont(new Font("serif", Font.ROMAN_BASELINE, 25));
         discharge.setBounds(400, 314, 50, 50);
         discharge.addActionListener(e -> {
-            if(pacientes.isEmpty()) {
+            if (pacientes.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "No hay datos para descargar el archivo csv",
                         "Advertencia", JOptionPane.WARNING_MESSAGE);
                 return;
@@ -200,7 +201,7 @@ public class AnalisisEstadistico extends JFrame {
     }
 
     private void resetForm() {
-        fecha.setText("");
+        fecha.setText("DD/MM/AAAA");
         edad.setText("");
         sexo.setSelectedIndex(-1);
         diagnostico.setSelectedIndex(-1);
@@ -237,7 +238,8 @@ public class AnalisisEstadistico extends JFrame {
         group.add(Lineas);
         group.add(circular);
 
-        int opcion = JOptionPane.showConfirmDialog(null, panel, "Tipos de gráfica", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        int opcion = JOptionPane.showConfirmDialog(null, panel, "Tipos de gráfica", JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE);
 
         if (opcion == JOptionPane.OK_OPTION) {
             if (barras.isSelected()) {
@@ -250,7 +252,7 @@ public class AnalisisEstadistico extends JFrame {
                 graficoCircular.generateChart(pacientes);
                 graficoCircular.setVisible(true);
             }
-        }  
+        }
 
     }
 
@@ -275,10 +277,31 @@ public class AnalisisEstadistico extends JFrame {
     private void createForm() {
         labelsForm();
 
-        fecha = new JTextField();
+        fecha = new JTextField("DD/MM/AAAA");
         fecha.setBounds(30, 77, 480, 25);
+        fecha.addFocusListener(new FocusListener() {
+
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (fecha.getText().equals("DD/MM/AAAA")) {
+                    fecha.setText("");
+                    fecha.setForeground(Color.WHITE);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if(fecha.getText().isEmpty()) {
+                    fecha.setText("DD/MM/AAAA");
+                    fecha.setForeground(new Color(236,236,236,120));
+                }
+               
+            }
+
+        });
 
         edad = new JTextField();
+        edad.setForeground(Color.WHITE);
         edad.setBounds(30, 138, 190, 25);
 
         sexo = new JComboBox<>(new String[] { "Masculino", "Femenino" });
@@ -433,6 +456,11 @@ public class AnalisisEstadistico extends JFrame {
 
         try {
             edadIngresada = Integer.parseInt(edad.getText());
+            if(edadIngresada < 1 || edadIngresada > 110) {
+                JOptionPane.showMessageDialog(this, "Edad ingresada no valida!", "Error",
+                JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Por favor, ingrese un número válido para la edad", "Error",
@@ -441,9 +469,14 @@ public class AnalisisEstadistico extends JFrame {
         }
 
         try {
-            año = Integer.parseInt(validar[0]);
-            mes = Integer.parseInt(validar[1]);
-            dia = Integer.parseInt(validar[2]);
+            mes = Integer.parseInt(validar[0]);
+            dia = Integer.parseInt(validar[1]);
+            año = Integer.parseInt(validar[2]);
+            if((mes < 1 || mes > 12) || (dia < 1 || dia > 31) || (año < 1000 || año > 2024)) {
+                JOptionPane.showMessageDialog(this, "Fecha ingresada no valida!", "Error",
+                JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Ingresar numeros enteros para la fecha", "Error",
@@ -451,7 +484,7 @@ public class AnalisisEstadistico extends JFrame {
             return;
         }
 
-        String fechaComplet = String.format("%02d/%02d/%02d", año, mes, dia);
+        String fechaComplet = String.format("%02d/%02d/%02d", mes, dia, año);
 
         Paciente pacient = new Paciente(diagnosticoSeleccionado, edadIngresada);
         pacientes.add(pacient);
@@ -461,6 +494,7 @@ public class AnalisisEstadistico extends JFrame {
         fila.add(fechaComplet);
         fila.add(edadVal);
         fila.add(sexoVal);
+        fila.add(codigo(diagnosticoSeleccionado));
         fila.add(diagnosticoSeleccionado);
         fila.add(principalVal);
         fila.add(tipoVal);
@@ -476,7 +510,8 @@ public class AnalisisEstadistico extends JFrame {
     }
 
     private void generateCsv() {
-        String[] columna = { "Fecha", "Edad", "Sexo", "Diagnostico", "Principal", "Tipo", "Clase", "Especialidad" };
+        String[] columna = { "Fecha", "Edad", "Sexo", "Codigo", "Diagnostico", "Principal", "Tipo", "Clase",
+                "Especialidad" };
 
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Diagnostico por edad");
@@ -491,15 +526,33 @@ public class AnalisisEstadistico extends JFrame {
 
                 for (ArrayList<String> fila : save) {
                     writer.write(String.join("-", fila));
-                    writer.newLine(); 
+                    writer.newLine();
                 }
 
-                JOptionPane.showMessageDialog(this, "Archivo CSV guardado exitosamente."); 
+                JOptionPane.showMessageDialog(this, "Archivo CSV guardado exitosamente.");
 
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null, "Error al guardar el archivo: " + ex.getMessage());
             }
 
+        }
+
+    }
+
+    private String codigo(String diagnostico) {
+        switch (diagnostico) {
+            case "Acne Quistico":
+                return "L70. 0";
+            case "Dermatitis Seborreica":
+                return "L21. 9";
+            case "Rosacea":
+                return "L71. 9";
+            case "Lentigo Solar":
+                return "L81. 0";
+            case "Fotoenvejecimiento":
+                return "L67. 3";
+            default:
+                return "null";
         }
 
     }
