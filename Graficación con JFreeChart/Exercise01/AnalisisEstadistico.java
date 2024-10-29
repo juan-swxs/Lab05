@@ -469,10 +469,10 @@ public class AnalisisEstadistico extends JFrame {
         }
 
         try {
-            mes = Integer.parseInt(validar[0]);
-            dia = Integer.parseInt(validar[1]);
+            dia = Integer.parseInt(validar[0]);
+            mes = Integer.parseInt(validar[1]);
             año = Integer.parseInt(validar[2]);
-            if((mes < 1 || mes > 12) || (dia < 1 || dia > 31) || (año < 1000 || año > 2024)) {
+            if((dia < 1 || dia > 31) || (mes < 1 || mes > 12) || (año < 1000 || año > 2024)) {
                 JOptionPane.showMessageDialog(this, "Fecha ingresada no valida!", "Error",
                 JOptionPane.ERROR_MESSAGE);
                 return;
@@ -484,7 +484,7 @@ public class AnalisisEstadistico extends JFrame {
             return;
         }
 
-        String fechaComplet = String.format("%02d/%02d/%02d", mes, dia, año);
+        String fechaComplet = String.format("%02d/%02d/%02d", dia, mes, año);
 
         Paciente pacient = new Paciente(diagnosticoSeleccionado, edadIngresada);
         pacientes.add(pacient);
